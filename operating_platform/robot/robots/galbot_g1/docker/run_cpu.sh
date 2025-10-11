@@ -1,8 +1,8 @@
 #!/bin/bash
 
-IMAGE_NAME=dr-image-so101-v1
+IMAGE_NAME=dr-image-galbot-g1
 IMAGE_VERSION=V0.2
-CONTAINER_NAME=dr-container-so101-v1
+CONTAINER_NAME=dr-container-galbot-g1
 DOROBOT_HOME_HOST="/home/${USER}/DoRobot"
 DOROBOT_HOME=/root/DoRobot
 
