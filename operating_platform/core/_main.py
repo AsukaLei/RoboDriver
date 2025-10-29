@@ -3,23 +3,27 @@ import time
 import threading
 import queue
 import asyncio, aiohttp
-import socketio
+import socketio, requests
 import logging_mp
+logger = logging_mp.get_logger(__name__)
+# import operating_platform.utils.colored_logging as clog
 
+from dataclasses import dataclass, asdict
+from pprint import pformat
 from datetime import datetime
 from typing import Dict, List
 
+from operating_platform.robot.robots.configs import RobotConfig
+from operating_platform.utils import parser
+from operating_platform.utils.utils import has_method, log_say, get_current_git_branch, git_branch_log, cameras_to_stream_json
+# from operating_platform.utils.colored_logging import info
+from operating_platform.utils.data_file import find_epindex_from_dataid_json, check_disk_space
+from operating_platform.utils.constants import DOROBOT_DATASET, DEFAULT_FPS, RERUN_WEB_PORT, RERUN_WS_PORT
 from operating_platform.dataset.dorobot_dataset import *
 from operating_platform.dataset.visual.visual_dataset import visualize_dataset
 from operating_platform.robot.daemon import Daemon
 from operating_platform.core.recorder import Record, RecordConfig
 from operating_platform.core.replayer import DatasetReplayConfig, ReplayConfig, replay
-from operating_platform.utils.utils import has_method, log_say, get_current_git_branch, git_branch_log, cameras_to_stream_json
-from operating_platform.utils.data_file import find_epindex_from_dataid_json, check_disk_space
-from operating_platform.utils.constants import DOROBOT_DATASET, DEFAULT_FPS, RERUN_WEB_PORT, RERUN_WS_PORT
-
-
-logger = logging_mp.get_logger(__name__)
 
 
 class Coordinator:
@@ -84,7 +88,7 @@ class Coordinator:
         global repo_id
         # 根据命令类型进行响应
         if data.get('cmd') == 'video_list':
-            logger.info("处理更新视频流命令...")
+            print("处理更新视频流命令...")
             response_data = cameras_to_stream_json(self.cameras)
             # 发送响应
             try:
@@ -92,25 +96,24 @@ class Coordinator:
                     f"{self.server_url}/robot/stream_info",
                     json = response_data,
                 )
-                logger.info(f"已发送响应 [{data.get('cmd')}]: {response_data}")
+                print(f"已发送响应 [{data.get('cmd')}]: {response_data}")
             except Exception as e:
-                logger.error(f"发送响应失败 [{data.get('cmd')}]: {e}")
+                print(f"发送响应失败 [{data.get('cmd')}]: {e}")
             
         elif data.get('cmd') == 'start_collection':
-            logger.info("处理开始采集命令...")
+            print("处理开始采集命令...")
+            if not check_disk_space(min_gb=2):  # 检查是否 ≥1GB
+                print("存储空间不足,小于2GB,取消采集！")
+                await self.send_response('start_collection', "存储空间不足,小于2GB")
             msg = data.get('msg')
 
-            if not check_disk_space(min_gb=2):
-                logger.warning("存储空间不足,小于2GB,取消采集！")
-                await self.send_response('start_collection', "存储空间不足,小于2GB")
-                return
-
             if self.replaying == True:
-                logger.warning("Replay is running, cannot start collection.")
                 await self.send_response('start_collection', "fail")
+                print("Replay is running, cannot start collection.")
                 return
-            
             if self.recording == True:
+                # self.send_response('start_collection', "fail")
+
                 self.record.stop()
                 self.record.discard()
                 self.recording = False
@@ -142,28 +145,28 @@ class Coordinator:
 
             # 检查数据集目录是否存在
             if not dataset_path.exists():
-                logger.info(f"Dataset directory '{dataset_path}' does not exist. Cannot resume.")
+                logging.info(f"Dataset directory '{dataset_path}' does not exist. Cannot resume.")
             else:
                 # 检查目标文件夹是否存在且为目录
                 if target_dir.exists() and target_dir.is_dir():
                     # resume = True
                     # logging.info(f"Found existing directory for repo_id '{repo_id}'. Resuming operation.")
 
-                    logger.info(f"Found existing directory for repo_id '{repo_id}'. Delete directory.")
+                    logging.info(f"Found existing directory for repo_id '{repo_id}'. Delete directory.")
                     shutil.rmtree(target_dir)
                     time.sleep(0.5) # make sure delete success.
                 else:
-                    logger.info(f"No directory found for repo_id '{repo_id}'. Starting fresh.")
+                    logging.info(f"No directory found for repo_id '{repo_id}'. Starting fresh.")
 
             # resume 变量现在可用于后续逻辑
-            logger.info(f"Resume mode: {'Enabled' if resume else 'Disabled'}")
+            print(f"Resume mode: {'Enabled' if resume else 'Disabled'}")
 
             record_cfg = RecordConfig(fps=DEFAULT_FPS, repo_id=repo_id, video=self.daemon.robot.use_videos, resume=resume, root=target_dir)
             self.record = Record(fps=DEFAULT_FPS, robot=self.daemon.robot, daemon=self.daemon, record_cfg = record_cfg, record_cmd=msg)
             # 发送响应
             await self.send_response('start_collection', "success")
             # 开始采集倒计时
-            logger.info(f"开始采集倒计时{countdown_seconds}s...")
+            print(f"开始采集倒计时{countdown_seconds}s...")
             time.sleep(countdown_seconds)
 
             # 开始采集
@@ -171,10 +174,11 @@ class Coordinator:
 
         
         elif data.get('cmd') == 'finish_collection':
-            logger.info("处理完成采集命令...")
+            # 模拟处理完成采集
+            print("处理完成采集命令...")
             if self.replaying == True:
-                logger.warning("Replay is running, cannot finish collection.")
                 await self.send_response('finish_collection', "fail")
+                print("Replay is running, cannot finish collection.")
                 return
             
             if not self.saveing and self.record.save_data is None:
@@ -198,11 +202,11 @@ class Coordinator:
 
         elif data.get('cmd') == 'discard_collection':
             # 模拟处理丢弃采集
-            logger.info("处理丢弃采集命令...")
+            print("处理丢弃采集命令...")
 
             if self.replaying == True:
-                logger.warning("Replay is running, cannot discard collection.")
-                await self.send_response('discard_collection', "fail")
+                self.send_response('discard_collection', "fail")
+                print("Replay is running, cannot discard collection.")
                 return
             
             self.record.stop()
@@ -214,26 +218,26 @@ class Coordinator:
 
         elif data.get('cmd') == 'submit_collection':
             # 模拟处理提交采集
-            logger.info("处理提交采集命令...")
+            print("处理提交采集命令...")
             time.sleep(0.01)  # 模拟处理时间
 
             if self.replaying == True:
-                logger.warning("Replay is running, cannot submit collection.")
                 await self.send_response('submit_collection', "fail")
+                print("Replay is running, cannot submit collection.")
                 return
             # 发送响应
             await self.send_response('submit_collection', "success")
 
         elif data.get('cmd') == 'start_replay':
-            logger.info("处理开始回放命令...")
+            print("处理开始回放命令...")
             msg = data.get('msg')
             if self.recording == True:
-                logger.warning("Recording is running, cannot start replay.")
                 await self.send_response('start_replay', "fail")
+                print("Recording is running, cannot start replay.")
                 return
             if self.replaying == True:
-                logger.warning("Replay is already running.")
                 await self.send_response('start_replay', "fail")
+                print("Replay is already running.")
                 return
             self.replaying = True
 
@@ -259,7 +263,7 @@ class Coordinator:
             
             dataset = DoRobotDataset(repo_id, root=target_dir)
        
-            logger.info(f"开始回放数据集: {repo_id}, 目标目录: {target_dir}, 任务数据ID: {task_data_id}, 回放索引: {ep_index}")
+            print(f"开始回放数据集: {repo_id}, 目标目录: {target_dir}, 任务数据ID: {task_data_id}, 回放索引: {ep_index}")
 
             replay_dataset_cfg = DatasetReplayConfig(repo_id, ep_index, target_dir, fps=DEFAULT_FPS)
             replay_cfg = ReplayConfig(self.daemon.robot, replay_dataset_cfg)
@@ -310,7 +314,7 @@ class Coordinator:
                 
                 # 检查线程是否已退出
                 if visual_thread.is_alive():
-                    logger.warning("Warning: Visual thread did not exit cleanly")
+                    print("Warning: Visual thread did not exit cleanly")
                 
                 # 处理子线程异常
                 try:
@@ -319,8 +323,9 @@ class Coordinator:
                 except queue.Empty:
                     pass
             self.replaying = False
-
-            logger.info("="*20 + "Replay Complete Success!" + "="*20)
+            print("="*20)
+            print("Replay Complete Success!")
+            print("="*20)
     
     ####################### Client Send to Server ############################
     async def send_heartbeat_loop(self):
@@ -332,7 +337,7 @@ class Coordinator:
                     await self.sio.emit('HEARTBEAT')
                     self.last_heartbeat_time = current_time
                 except Exception as e:
-                    logger.error(f"发送心跳失败: {e}")
+                    print(f"发送心跳失败: {e}")
             time.sleep(1)
             await self.sio.wait()
 
@@ -348,9 +353,9 @@ class Coordinator:
                 json=payload,
                 timeout=aiohttp.ClientTimeout(total=2)
             ) as resp:
-                logger.info(f"已发送响应 [{cmd}]: {payload}")
+                print(f"已发送响应 [{cmd}]: {payload}")
         except Exception as e:
-            logger.error(f"发送响应失败 [{cmd}]: {e}")
+            print(f"发送响应失败 [{cmd}]: {e}")
 
     ####################### Robot API ############################
     def stream_info(self, info: Dict[str, int]):
@@ -389,3 +394,68 @@ class Coordinator:
             logger.warning("update_stream timeout")
         except Exception as e:
             logger.error("update_stream exception:", e)
+
+
+@dataclass
+class ControlPipelineConfig:
+    robot: RobotConfig
+
+    @classmethod
+    def __get_path_fields__(cls) -> List[str]:
+        """This enables the parser to load config from the policy using `--policy.path=local/dir`"""
+        return ["control.policy"]
+
+
+async def async_main(cfg: ControlPipelineConfig):
+    logging_mp.basic_config(level=logging_mp.INFO)
+    logger.info(f"Registered robot types: {list(RobotConfig._choice_registry.keys())}")
+    logger.info(pformat(asdict(cfg)))
+    git_branch_log()
+
+    daemon = Daemon(fps=DEFAULT_FPS)
+    daemon.start(cfg.robot)
+
+    coordinator = Coordinator(daemon)
+    await coordinator.start()
+
+    coordinator.stream_info(daemon.cameras_info)
+    await coordinator.update_stream_info_to_server()
+
+    try:
+        while True:
+            daemon.update()
+            observation = daemon.get_observation()
+            if observation is not None:
+                tasks = []
+                for key in observation:
+                    if "image" in key and "depth" not in key:
+                        img = cv2.cvtColor(observation[key].numpy(), cv2.COLOR_RGB2BGR)
+                        name = key[len("observation.images."):]
+                        tasks.append(
+                            coordinator.update_stream_async(name, img)
+                        )
+                if tasks:
+                    try:
+                        await asyncio.wait_for(
+                            asyncio.gather(*tasks, return_exceptions=True),
+                            timeout=0.2
+                        )
+                    except asyncio.TimeoutError:
+                        pass
+            else:
+                logger.warning("observation is none")
+            await asyncio.sleep(0)   # 让事件循环可以调度
+    except KeyboardInterrupt:
+        logger.info("coordinator and daemon stop")
+    finally:
+        daemon.stop()
+        await coordinator.stop()
+
+
+@parser.wrap()
+def main(cfg: ControlPipelineConfig):
+    asyncio.run(async_main(cfg))
+
+
+if __name__ == "__main__":
+    main()

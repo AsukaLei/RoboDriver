@@ -43,6 +43,7 @@ dependencies = [
     "websockets",
     "protobuf==4.21",
     "colorama",
+    "scipy",
 ]
 
 [tool.setuptools.packages.find]

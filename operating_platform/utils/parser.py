@@ -23,8 +23,11 @@ from typing import Union, Optional, List
 import typing
 
 import draccus
+import logging_mp
+logger = logging_mp.get_logger(__name__)
 
 from operating_platform.utils.utils import has_method
+
 
 PATH_KEY = "path"
 PLUGIN_DISCOVERY_SUFFIX = "discover_packages_path"
@@ -210,7 +213,7 @@ def wrap(config_path: Optional[Path] = None):
             argspec = inspect.getfullargspec(fn)
             resolved_hints = typing.get_type_hints(fn)
             argtype = resolved_hints[argspec.args[0]]
-            print("DEBUG: argtype =", argtype, type(argtype))
+            logger.debug("wrapper argtype =", argtype, type(argtype))
             if len(args) > 0 and type(args[0]) is argtype:
                 cfg = args[0]
                 args = args[1:]

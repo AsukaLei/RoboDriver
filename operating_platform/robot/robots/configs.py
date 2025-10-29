@@ -1,40 +1,11 @@
-# Copyright 2024 The HuggingFace Inc. team. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import abc
 from dataclasses import dataclass, field
 from typing import Sequence, Dict, List, Union, Optional
 
 import draccus
 
-from operating_platform.robot.robots.com_configs.cameras import (
-    CameraConfig,
-    IntelRealSenseCameraConfig,
-    OpenCVCameraConfig,
-    DDSCameraConfig,
-)
-
-from operating_platform.robot.robots.com_configs.motors import (
-    PikaMotorsBusConfig,
-    PiperMotorsBusConfig,
-    DynamixelMotorsBusConfig,
-    FeetechMotorsBusConfig,
-    MotorsBusConfig,
-    RosMotorsBusConfig,
-    DDSMotorsBusConfig,
-    DexterousHandMotorsBusConfig,
-)
+from operating_platform.robot.robots.com_configs.cameras import CameraConfig
+from operating_platform.robot.robots.com_configs.motors import MotorsBusConfig
 
 
 @dataclass
@@ -43,23 +14,14 @@ class RobotConfig(draccus.ChoiceRegistry, abc.ABC):
     def type(self) -> str:
         return self.get_choice_name(self.__class__)
 
-
-# TODO(rcadene, aliberts): remove ManipulatorRobotConfig abstraction
 @dataclass
 class ManipulatorRobotConfig(RobotConfig):
     leader_arms: Dict[str, MotorsBusConfig] = field(default_factory=dict)
     follower_arms: Dict[str, MotorsBusConfig] = field(default_factory=dict)
     cameras: Dict[str, CameraConfig] = field(default_factory=dict)
 
-    # Optionally limit the magnitude of the relative positional target vector for safety purposes.
-    # Set this to a positive scalar to have the same value for all motors, or a list that is the same length
-    # as the number of motors in your follower arms (assumes all follower arms have the same number of
-    # motors).
     max_relative_target: Optional[Union[List[float], float]] = None
 
-    # Optionally set the leader arm in torque mode with the gripper motor set to this angle. This makes it
-    # possible to squeeze the gripper and have it spring back to an open position on its own. If None, the
-    # gripper is not put in torque mode.
     gripper_open_degree: Optional[float] = None
 
     mock: bool = False
@@ -87,22 +49,14 @@ class ManipulatorRobotConfig(RobotConfig):
                         "different numbers of motors."
                     )
 
-
 @dataclass
 class DDSManipulatorRobotConfig(RobotConfig):
     leader_motors: Dict[str, MotorsBusConfig] = field(default_factory=dict)
     follower_motors: Dict[str, MotorsBusConfig] = field(default_factory=dict)
     cameras: Dict[str, CameraConfig] = field(default_factory=dict)
 
-    # Optionally limit the magnitude of the relative positional target vector for safety purposes.
-    # Set this to a positive scalar to have the same value for all motors, or a list that is the same length
-    # as the number of motors in your follower arms (assumes all follower arms have the same number of
-    # motors).
     max_relative_target: Optional[Union[List[float], float]] = None
 
-    # Optionally set the leader arm in torque mode with the gripper motor set to this angle. This makes it
-    # possible to squeeze the gripper and have it spring back to an open position on its own. If None, the
-    # gripper is not put in torque mode.
     gripper_open_degree: Optional[float] = None
 
     mock: bool = False
