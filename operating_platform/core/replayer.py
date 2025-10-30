@@ -1,14 +1,8 @@
-from __future__ import annotations
-import logging
 import time
-from dataclasses import asdict, dataclass
-from pathlib import Path
-from pprint import pformat
-
 import draccus
-import torch
 import logging_mp
-logger = logging_mp.get_logger(__name__)
+from dataclasses import dataclass
+from pathlib import Path
 
 from operating_platform.robot.daemon import Daemon
 
@@ -22,6 +16,9 @@ from operating_platform.robot.robots.utils import (
 from operating_platform.utils.utils import (
     log_say,
 )
+
+
+logger = logging_mp.get_logger(__name__)
 
 
 @dataclass
@@ -71,7 +68,7 @@ def replay(cfg: ReplayConfig):
         #         continue
         # robot.send_action(action_tensor)
 
-        print(f"Replay action: {action}")
+        logger.info(f"Replay action: {action}")
         
         robot.send_action(action)
 

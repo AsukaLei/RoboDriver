@@ -48,7 +48,7 @@ def log_control_info(robot: Robot, dt_s, episode_index=None, frame_index=None, f
                 log_dt(f"dt_R_camera_{name}", robot.logs[key])
 
     info_str = " ".join(log_items)
-    logger.info(info_str)
+    logger.debug(info_str)
 
 
 class Daemon:

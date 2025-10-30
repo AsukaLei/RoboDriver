@@ -1,7 +1,8 @@
-from typing import Protocol
-
 import platform
 import time
+import logging_mp
+
+from typing import Protocol
 
 from operating_platform.robot.robots.configs import RobotConfig
 from operating_platform.robot.robots import (  # noqa: F401
@@ -9,6 +10,10 @@ from operating_platform.robot.robots import (  # noqa: F401
     galbot_g1,
     leju_kuavo4p,
 )
+
+
+logger = logging_mp.get_logger(__name__)
+
 
 def busy_wait(seconds):
     if platform.system() == "Darwin":
@@ -80,53 +85,53 @@ class Robot(Protocol):
 
 
 def make_robot_from_config(config: RobotConfig):
-    print("In make_robot_from_config")
+    logger.info("In make_robot_from_config")
 
     if config.type == "adora":
         from operating_platform.robot.robots.adora_v1.manipulator import AdoraManipulator
-        print("In AdoraRobotConfig")
+        logger.info("In AdoraRobotConfig")
         return AdoraManipulator(config)
     
     elif config.type == "aloha":
         from operating_platform.robot.robots.aloha_v1.manipulator import AlohaManipulator
-        print("In AlohaManipulator")
+        logger.info("In AlohaManipulator")
         return AlohaManipulator(config)
     
     elif config.type == "pika":
         from operating_platform.robot.robots.pika_v1.manipulator import PikaV1Manipulator
-        print("In PikaV1Manipulator")
+        logger.info("In PikaV1Manipulator")
         return PikaV1Manipulator(config)
     
     elif config.type == "so101":
         from operating_platform.robot.robots.so101_v1.manipulator import SO101Manipulator
-        print("In SO101Manipulator")
+        logger.info("In SO101Manipulator")
         return SO101Manipulator(config)
 
     elif config.type == "realman":
         from operating_platform.robot.robots.realman_v1.manipulator import RealmanManipulator
-        print("In RealmanRobotConfig")
+        logger.info("In RealmanRobotConfig")
         return RealmanManipulator(config)
     
     elif config.type == "dexhand":
         from operating_platform.robot.robots.dexterous_hand_v1.manipulator import DexterousHandManipulator
-        print("In DexterousHandMotorsBusConfig")
+        logger.info("In DexterousHandMotorsBusConfig")
         return DexterousHandManipulator(config)
     
     elif config.type == "galaxea":
         from operating_platform.robot.robots.galaxea_v1.manipulator import GALAXEAManipulator
-        print("In GALAXEARobotConfig")
+        logger.info("In GALAXEARobotConfig")
         return GALAXEAManipulator(config)
     
     elif config.type == "galbot_g1":
         from operating_platform.robot.robots.galbot_g1.manipulator import GalbotG1Manipulator
-        print("In GalbotG1RobotConfig")
+        logger.info("In GalbotG1RobotConfig")
         return GalbotG1Manipulator(config)
     
     elif config.type == "leju_kuavo4p":
         from operating_platform.robot.robots.leju_kuavo4p.manipulator import LejuKuavo4pManipulator
-        print("In LejuKuavo4pRobotConfig")
+        logger.info("In LejuKuavo4pRobotConfig")
         return LejuKuavo4pManipulator(config)
     
     else:
-        print("Not match robot")
+        logger.error("Not match robot")
         raise ValueError(f"Robot type is not available.")
