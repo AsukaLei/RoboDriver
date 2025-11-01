@@ -94,6 +94,8 @@ class PikaV1RobotConfig(RobotConfig):
         }
     )
 
+    use_videos: bool = False
+
     microphones: dict[str, int] = field(
         default_factory=lambda: {
             "audio_right": 0,

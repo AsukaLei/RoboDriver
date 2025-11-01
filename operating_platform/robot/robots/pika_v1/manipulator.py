@@ -232,7 +232,8 @@ class PikaV1Manipulator:
         self.follower_arms = {}
         self.follower_arms['right'] = self.config.right_leader_arm.motors
         self.follower_arms['left'] = self.config.left_leader_arm.motors
-
+        
+        self.use_videos = self.config.use_videos
         self.cameras = make_cameras_from_configs(self.config.cameras)
         self.microphones = self.config.microphones
         
