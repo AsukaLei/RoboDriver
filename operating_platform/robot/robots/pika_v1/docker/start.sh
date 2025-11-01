@@ -217,7 +217,7 @@ else
 fi
 
 log "启动协调器..."
-$EXEC_FUNCTION "cd $PROJECT_DIR && $CONDA_ACTIVATE $CONDA_ENV1 && python operating_platform/core/coordinator.py --robot.type=pika_v1" "logs/coordinator.log"
+$EXEC_FUNCTION "cd $PROJECT_DIR && $CONDA_ACTIVATE $CONDA_ENV1 && python operating_platform/scripts/run.py --robot.type=pika_v1" "logs/coordinator.log"
 
 sleep 3 
 
