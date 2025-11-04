@@ -83,6 +83,7 @@ class Robot(Protocol):
     def capture_observation(self): ...
     def send_action(self, action): ...
     def disconnect(self): ...
+    def update_status(self): ...  # 声明但无实现
 
 
 def make_robot_from_config(config: RobotConfig):
@@ -136,3 +137,10 @@ def make_robot_from_config(config: RobotConfig):
     else:
         logger.error("Not match robot")
         raise ValueError(f"Robot type is not available.")
+    
+
+def safe_update_status(robot: Robot) -> None:
+    if hasattr(robot, 'update_status'):
+        robot.update_status()
+    else:
+        print(f"[{robot.robot_type}] Status: idle (fallback default)")
