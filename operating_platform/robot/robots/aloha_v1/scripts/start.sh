@@ -177,7 +177,7 @@ execute_in_container "cd $PROJECT_DIR && $CONDA_ACTIVATE $CONDA_ENV1 && dora run
 sleep 5  # 简单的依赖等待
 
 log "启动协调器..."
-execute_in_container "cd $PROJECT_DIR && $CONDA_ACTIVATE $CONDA_ENV2 && python operating_platform/scripts/run.py --robot.type=aloha" "$COORDINATOR_LOG"
+execute_in_container "cd $PROJECT_DIR && $CONDA_ACTIVATE $CONDA_ENV2 && python operating_platform/scripts/run.py --robot.type=aloha_v1" "$COORDINATOR_LOG"
 
 sleep 2  # 简单的依赖等待
 
