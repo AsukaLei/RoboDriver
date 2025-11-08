@@ -98,7 +98,7 @@ def make_robot_from_config(config: RobotConfig):
         return AdoraManipulator(config)
     
     elif config.type == "aloha_v1":
-        from operating_platform.robot.robots.aloha_v1.manipulator import AlohaManipulator
+        from operating_platform.robot.robots.aloha_v1.src.manipulator import AlohaManipulator
         logger.info("In AlohaManipulator")
         return AlohaManipulator(config)
     
