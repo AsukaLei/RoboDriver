@@ -19,6 +19,10 @@ logger = logging_mp.get_logger(__name__)
 
 
 class SO101FollowerDoraRobot(Robot):
+    config_class = SO101FollowerDoraRobotConfig
+    name = "so101_follower_dora"
+
+
     def __init__(self, config: SO101FollowerDoraRobotConfig):
         self.config = config
         self.robot_type = self.config.type
@@ -43,8 +47,7 @@ class SO101FollowerDoraRobot(Robot):
 
     @property
     def _motors_ft(self) -> dict[str, type]:
-        # return {f"{motor}.pos": float for motor in self.bus.motors}
-        return {f"{arm}_{motor}.pos": float for arm, bus in self.follower_arms.items() for motor in bus.motors}
+        return {f"{motor}.pos": float for _arm, bus in self.follower_arms.items() for motor in bus.motors}
 
     @property
     def _cameras_ft(self) -> dict[str, tuple]:
@@ -61,53 +64,56 @@ class SO101FollowerDoraRobot(Robot):
         return self._motors_ft
     
 
-    def get_motor_names(self, arms: dict[str, dict]) -> list:
-        return [f"{arm}_{motor}" for arm, bus in arms.items() for motor in bus.motors]
+    # def get_motor_names(self, arms: dict[str, dict]) -> list:
+    #     return [f"{arm}_{motor}" for arm, bus in arms.items() for motor in bus.motors]
 
-    @property
-    def camera_features(self) -> dict:
-        cam_ft = {}
-        for cam_key, cam in self.cameras.items():
-            key = f"observation.images.{cam_key}"
-            cam_ft[key] = {
-                "shape": (cam.height, cam.width, cam.channels),
-                "names": ["height", "width", "channels"],
-                "info": None,
-            }
-        return cam_ft
+    # @property
+    # def camera_features(self) -> dict:
+    #     cam_ft = {}
+    #     for cam_key, cam in self.cameras.items():
+    #         key = f"observation.images.{cam_key}"
+    #         cam_ft[key] = {
+    #             "shape": (cam.height, cam.width, cam.channels),
+    #             "names": ["height", "width", "channels"],
+    #             "info": None,
+    #         }
+    #     return cam_ft
     
-    @property
-    def microphone_features(self) -> dict:
-        mic_ft = {}
-        for mic_key, mic in self.microphones.items():
-            key = f"observation.audio.{mic_key}"
-            mic_ft[key] = {
-                "shape": (1,),
-                "names": ["channels"],
-                "info": None,
-            }
-        return mic_ft
+    # @property
+    # def microphone_features(self) -> dict:
+    #     mic_ft = {}
+    #     for mic_key, mic in self.microphones.items():
+    #         key = f"observation.audio.{mic_key}"
+    #         mic_ft[key] = {
+    #             "shape": (1,),
+    #             "names": ["channels"],
+    #             "info": None,
+    #         }
+    #     return mic_ft
     
-    @property
-    def motor_features(self) -> dict:
-        action_names = self.get_motor_names(self.leader_arms)
-        state_names = self.get_motor_names(self.follower_arms)
-        return {
-            "action": {
-                "dtype": "float32",
-                "shape": (len(action_names),),
-                "names": action_names,
-            },
-            "observation.state": {
-                "dtype": "float32",
-                "shape": (len(state_names),),
-                "names": state_names,
-            },
-        }
+    # @property
+    # def motor_features(self) -> dict:
+    #     action_names = self.get_motor_names(self.leader_arms)
+    #     state_names = self.get_motor_names(self.follower_arms)
+    #     return {
+    #         "action": {
+    #             "dtype": "float32",
+    #             "shape": (len(action_names),),
+    #             "names": action_names,
+    #         },
+    #         "observation.state": {
+    #             "dtype": "float32",
+    #             "shape": (len(state_names),),
+    #             "names": state_names,
+    #         },
+    #     }
     
     def connect(self):
         timeout = 50  # 统一的超时时间（秒）
         start_time = time.perf_counter()
+
+        if self.is_connected:
+            raise DeviceAlreadyConnectedError(f"{self} already connected")
 
         # 定义所有需要等待的条件及其错误信息
         conditions = [
@@ -116,14 +122,14 @@ class SO101FollowerDoraRobot(Robot):
                 lambda: [name for name in self.cameras if name not in self.robot_dora_node.recv_images],
                 "等待摄像头图像超时"
             ),
-            (
-                lambda: all(
-                    any(name in key for key in self.robot_dora_node.recv_joint)
-                    for name in self.leader_arms
-                ),
-                lambda: [name for name in self.leader_arms if not any(name in key for key in self.robot_dora_node.recv_joint)],
-                "等待主臂关节角度超时"
-            ),
+            # (
+            #     lambda: all(
+            #         any(name in key for key in self.robot_dora_node.recv_joint)
+            #         for name in self.leader_arms
+            #     ),
+            #     lambda: [name for name in self.leader_arms if not any(name in key for key in self.robot_dora_node.recv_joint)],
+            #     "等待主臂关节角度超时"
+            # ),
             (
                 lambda: all(
                     any(name in key for key in self.robot_dora_node.recv_joint)
@@ -195,13 +201,13 @@ class SO101FollowerDoraRobot(Robot):
                         if name in self.robot_dora_node.recv_images and name not in self.connect_excluded_cameras]
             success_messages.append(f"摄像头: {', '.join(cam_received)}")
 
-        # 主臂数据状态
-        arm_data_types = ["主臂关节角度",]
-        for i, data_type in enumerate(arm_data_types, 1):
-            if conditions[i][0]():
-                arm_received = [name for name in self.leader_arms 
-                            if any(name in key for key in (self.robot_dora_node.recv_joint,)[i-1])]
-                success_messages.append(f"{data_type}: {', '.join(arm_received)}")
+        # # 主臂数据状态
+        # arm_data_types = ["主臂关节角度",]
+        # for i, data_type in enumerate(arm_data_types, 1):
+        #     if conditions[i][0]():
+        #         arm_received = [name for name in self.leader_arms 
+        #                     if any(name in key for key in (self.robot_dora_node.recv_joint,)[i-1])]
+        #         success_messages.append(f"{data_type}: {', '.join(arm_received)}")
         
         # 从臂数据状态
         arm_data_types = ["从臂关节角度",]
@@ -224,17 +230,17 @@ class SO101FollowerDoraRobot(Robot):
 
         self.is_connected = True
     
-    @property
-    def features(self):
-        return {**self.motor_features, **self.camera_features}
+    # @property
+    # def features(self):
+    #     return {**self.motor_features, **self.camera_features}
 
-    @property
-    def has_camera(self):
-        return len(self.cameras) > 0
+    # @property
+    # def has_camera(self):
+    #     return len(self.cameras) > 0
 
-    @property
-    def num_cameras(self):
-        return len(self.cameras)
+    # @property
+    # def num_cameras(self):
+    #     return len(self.cameras)
     
     def teleop_step(
         self, record_data=False, 
@@ -322,46 +328,57 @@ class SO101FollowerDoraRobot(Robot):
         if not self.is_connected:
             raise DeviceNotConnectedError(f"{self} is not connected.")
 
+        for key in self.robot_dora_node.recv_images_status:
+            self.robot_dora_node.recv_images_status[key] = max(0, self.robot_dora_node.recv_images_status[key] - 1)
+
+        for key in self.robot_dora_node.recv_joint_status:
+            self.robot_dora_node.recv_joint_status[key] = max(0, self.robot_dora_node.recv_joint_status[key] - 1)
+
         # Read arm position
         start = time.perf_counter()
-
-        obs_dict = self.bus.sync_read("Present_Position")
-
-        obs_dict = {f"{motor}.pos": val for motor, val in obs_dict.items()}
+        obs_dict = {
+            f"{motor}.pos": val 
+            for name, val in self.robot_dora_node.recv_joint.items() 
+                for _arm, bus in self.follower_arms.items() 
+                    for motor in bus.motors
+                        if motor in name
+        }
         dt_ms = (time.perf_counter() - start) * 1e3
         logger.debug(f"{self} read state: {dt_ms:.1f}ms")
 
         # Capture images from cameras
-        for cam_key, cam in self.cameras.items():
+        for cam_key, _cam in self.cameras.items():
+            
             start = time.perf_counter()
 
-            obs_dict[cam_key] = cam.async_read()
-            images[name] = self.robot_dora_node.recv_images[name]
+            # obs_dict[cam_key] = cam.async_read()
+            for name, val in self.robot_dora_node.recv_images.items():
+                if cam_key in name:
+                    obs_dict[cam_key] = val
+            
+            # self.robot_dora_node.recv_images[name]
             
             dt_ms = (time.perf_counter() - start) * 1e3
             logger.debug(f"{self} read {cam_key}: {dt_ms:.1f}ms")
 
         return obs_dict
 
-    def send_action(self, action: dict[str, Any]):
+    def send_action(self, action: dict[str, Any]) -> dict[str, Any]:
         """The provided action is expected to be a vector."""
         if not self.is_connected:
             raise DeviceNotConnectedError(
-                "KochRobot is not connected. You need to run `robot.connect()`."
+                f"{self} is not connected. You need to run `robot.connect()`."
             )
 
-        for name in self.leader_arms:
-            goal_joint = [ val for key, val in action.items() if name in key and "joint" in key]
-            # goal_gripper = [ val for key, val in action.items() if name in key and "gripper" in key]
+        goal_joint = [ val for key, val in action.items() if "joint" in key]
+ 
+        goal_joint_numpy = np.array([t.item() for t in goal_joint], dtype=np.float32)
+        # goal_gripper_numpy = np.array([t.item() for t in goal_gripper], dtype=np.float32)
+        # position = np.concatenate([goal_joint_numpy, goal_gripper_numpy], axis=0)
 
-            # goal_joint = action[(arm_index*arm_action_dim+from_idx):(arm_index*arm_action_dim+to_idx)]
-            # goal_gripper = action[arm_index*arm_action_dim + 12]
-            # arm_index += 1
-            goal_joint_numpy = np.array([t.item() for t in goal_joint], dtype=np.float32)
-            # goal_gripper_numpy = np.array([t.item() for t in goal_gripper], dtype=np.float32)
-            # position = np.concatenate([goal_joint_numpy, goal_gripper_numpy], axis=0)
-
-            self.robot_dora_node.dora_send(f"action_joint_{name}", goal_joint_numpy, wait_time_s=0.01)
+        self.robot_dora_node.dora_send(f"action_joint", goal_joint_numpy, wait_time_s=0.01)
+        
+        return {f"{motor}.pos": val for motor, val in goal_joint.items()}
 
     def update_status(self) -> str:
 

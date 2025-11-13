@@ -119,11 +119,19 @@ def main():
                 arm_bus.sync_write("Goal_Position", goal_pos)
 
             elif event["id"] == "get_joint":
-                joint_value = []
+                # joint_value = []
                 present_pos = arm_bus.sync_read("Present_Position")
-                joint_value = [val for _motor, val in present_pos.items()]
 
-                node.send_output("joint", pa.array(joint_value, type=pa.float32()))
+                for motor, val in present_pos.items():
+                    node.send_output(f"joint_{motor}", pa.array([val], type=pa.float32()))
+
+                # joint_value = [val for _motor, val in present_pos.items()]
+                # metadata = {
+                #     "len": len(arm_bus.motors),
+                #     "names": list(arm_bus.motors.keys())
+                # }
+
+                # node.send_output("joint", pa.array(joint_value, type=pa.float32()), metadata)
 
             ctrl_frame -= 1
 

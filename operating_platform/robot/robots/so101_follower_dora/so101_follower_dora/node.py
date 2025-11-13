@@ -2,6 +2,7 @@ import logging_mp
 import threading
 import cv2
 import json
+import pyarrow as pa
 from dora import Node
 from typing import Any, Dict
 
@@ -26,11 +27,13 @@ class SO101FollowerDoraRobotNode(DoraRobotNode):
         self.recv_joint_status: Dict[str, int] = {}
         self.lock = threading.Lock()
 
+        self.thread = threading.Thread(target=self.dora_recv, daemon=True, args=(1,))
         self.running = False
-        self.thread = None
 
-    def dora_recv(self):
-        for event in self.node:
+    def dora_recv(self, timeout: float):
+        # for event in self.node:
+        while self.running:
+            event = self.node.next(timeout)
             if event["type"] == "INPUT":
                 event_id = event["id"]
                 data = event["value"].to_numpy()
@@ -66,14 +69,13 @@ class SO101FollowerDoraRobotNode(DoraRobotNode):
 
             elif event["type"] == "STOP":
                 break
-
-            if self.running == False:
-                break
         
         logger.warning("Dora Node is stopped.")
 
-    def dora_send():
-        pass
+    def dora_send(self, event_id, data):
+        # buffer_bytes = buffer.tobytes()
+        logger.debug(f"zmq send event_id:{event_id}, value:{data}")
+        self.node.send_output(event_id, pa.array(data, type=pa.float32()))
 
     def start(self):
         """Start Dora node thread"""
@@ -82,6 +84,6 @@ class SO101FollowerDoraRobotNode(DoraRobotNode):
             return
 
         self.running = True
-        self.thread = threading.Thread(target=self.dora_recv, daemon=True)
         self.thread.start()
+
         logger.info("Robot Dora node started. Waiting for images and sensor data...")

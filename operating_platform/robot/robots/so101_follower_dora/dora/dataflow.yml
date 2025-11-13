@@ -39,7 +39,12 @@ nodes:
       get_joint: dora/timer/millis/33
       action_joint_ctrl: so101_follower_dora/action_joint
     outputs:
-      - joint
+      - joint_shoulder_pan
+      - joint_shoulder_lift
+      - joint_elbow_flex
+      - joint_wrist_flex
+      - joint_wrist_roll
+      - joint_gripper
     env:
       GET_DEVICE_FROM: PORT
       PORT: /dev/ttyACM1
@@ -53,6 +58,11 @@ nodes:
       image_top: camera_top/image
       image_wrist: camera_wrist/image
       image_top_dep: camera_top_dep/image
-      main_follower_joint: arm_so101_follower/joint
+      follower_joint_shoulder_pan: arm_so101_follower/joint_shoulder_pan
+      follower_joint_shoulder_lift: arm_so101_follower/joint_shoulder_lift
+      follower_joint_elbow_flex: arm_so101_follower/joint_elbow_flex
+      follower_joint_wrist_flex: arm_so101_follower/joint_wrist_flex
+      follower_joint_wrist_roll: arm_so101_follower/joint_wrist_roll
+      follower_joint_gripper: arm_so101_follower/joint_gripper
     outputs:
       - action_joint
