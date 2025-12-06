@@ -10,6 +10,3 @@
 [submodule "robodriver/robots/realman_aio_dora"]
 	path = robodriver/robots/realman_aio_dora
 	url = https://github.com/XuRuntian/robodriver-robot-realman-follower-dora.git
-[submodule "robodriver/robots/robodriver-robot-franka-aio-dora"]
-	path = robodriver/robots/robodriver-robot-franka-aio-dora
-	url = git@github.com:BAAI-EI-DATA/robodriver-robot-franka-aio-dora.git
