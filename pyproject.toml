@@ -20,8 +20,9 @@ dependencies = [
 
     "rerun-sdk==0.26.2",
 
-    "python-socketio"
-
+    "python-socketio",
 ]
 
-[project.optional-dependencies]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["robodriver"]
