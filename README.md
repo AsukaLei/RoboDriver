@@ -49,7 +49,7 @@ RoboDriver 已完成多款主流机器人的适配，按接入方式示例如下
 ### 🔌 ROS1 接入
 | 机器人型号 | 简介 | 仓库链接 | 仓库贡献人（联系方式） |
 |------------|------|--------------|------------------------|
-| Realman 机械臂 | 基于Realman，6DOF+力控模块，3*RealSense相机    | https://github.com/BAAI-EI-DATA/robodriver-robot-realman-aio-ros1             | yangxiang（yangxiang@baai.ac.cn） |
+| Realman 机械臂 | 基于Realman，6DOF+力控模块，3*RealSense相机    | [robodriver/robots/robodriver-robot-realman-aio-ros1](./robodriver/robots/robodriver-robot-realman-aio-ros1)             | yangxiang（yangxiang@baai.ac.cn） |
 
 
 ### 🔌 ROS2 接入
