@@ -26,11 +26,12 @@ RoboDriver使用文档: [RoboDriver-Doc](https://flagopen.github.io/RoboDriver-D
 1. [概述](#概述)
 2. [主要特点](#主要特点)
 3. [快速入门](#快速入门)
-4. [机器人示例](#机器人示例)
-5. [参与贡献](#参与贡献)
-6. [帮助支持](#帮助支持)
-7. [许可证与致谢](#许可证和致谢)
-8. [引用](#引用)
+4. [仿真示例](#仿真示例)
+5. [机器人示例](#机器人示例)
+6. [参与贡献](#参与贡献)
+7. [帮助支持](#帮助支持)
+8. [许可证与致谢](#许可证和致谢)
+9. [引用](#引用)
 
 ## 主要特点
 
@@ -42,6 +43,18 @@ RoboDriver使用文档: [RoboDriver-Doc](https://flagopen.github.io/RoboDriver-D
 ## 快速入门
 
 请参考项目文档：[RoboDriver-Doc](https://flagopen.github.io/RoboDriver-Doc)
+
+## 仿真示例
+
+考虑到机器人在实际环境中的各种不确定性，我们推荐您首先使用我们提供的 `仿真示例` 来尝试使用 `RoboDriver`。
+
+RoboDriver 已完成 `Genesis` 仿真环境的适配，`mujoco` 和 `isaac sim` 等环境的适配正在开发中。使用请参考项目文档和仓库内对应的文件夹内`README`。
+
+### 🔌 Genesis
+
+| 机器人型号 | 简介 | 仓库链接 | 仓库贡献人（联系方式） |
+|------------|------|--------------|------------------------|
+| Franka 机械臂 | 一台Franka机械臂抓取方块 | [robodriver/simulations/robodriver-sim-genesis-franka-aio-dora](./robodriver/simulations/robodriver-sim-genesis-franka-aio-dora) | yangxiang（yangxiang@baai.ac.cn） |
 
 ## 机器人示例
 RoboDriver 已完成多款主流机器人的适配，按接入方式示例如下（各仓库包含对应机器人的接入步骤、环境配置、指令适配等完整指南）：

@@ -1,5 +1,5 @@
-# RoboDriver-Robot-SO101-AIO-Dora
-robodriver_sim_genesis_franka_aio_dora
+# RoboDriver-Sim-Genesis-Franka-AIO-Dora
+
 ## Start
 
 ```
