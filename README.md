@@ -54,7 +54,7 @@ RoboDriver 已完成 `Genesis` 仿真环境的适配，`mujoco` 和 `isaac sim` 
 
 | 机器人型号 | 简介 | 仓库链接 | 仓库贡献人（联系方式） |
 |------------|------|--------------|------------------------|
-| Franka 机械臂 | 一台Franka机械臂抓取方块 | [robodriver/simulations/robodriver-sim-genesis-franka-aio-dora](./robodriver/simulations/robodriver-sim-genesis-franka-aio-dora) | yang xiang（yangxiang@baai.ac.cn） |
+| Franka 机械臂 | 一台Franka机械臂抓取方块 | [robodriver/simulations/robodriver-sim-genesis-franka-aio-dora](./robodriver/simulations/robodriver-sim-genesis-franka-aio-dora) | [![Ryu-Yang](https://avatars.githubusercontent.com/Ryu-Yang?s=50)](https://github.com/Ryu-Yang) |
 
 ## 机器人示例
 RoboDriver 已完成多款主流机器人的适配，按接入方式示例如下（各仓库包含对应机器人的接入步骤、环境配置、指令适配等完整指南）：
