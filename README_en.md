@@ -3,8 +3,8 @@
 [![GitHub Issues](https://img.shields.io/github/issues/FlagOpen/RoboDriver)](https://github.com/FlagOpen/RoboDriver/issues)
 [![GitHub Discussions](https://img.shields.io/github/discussions/FlagOpen/RoboDriver)](https://github.com/FlagOpen/RoboDriver/discussions)
 
-[![README in English](https://img.shields.io/badge/English-d9d9d9)](./README.md)
-[![Simplified Chinese README](https://img.shields.io/badge/简体中文-d9d9d9)](./README_zh.md)
+[![README in English](https://img.shields.io/badge/English-d9d9d9)](./README_en.md)
+[![Simplified Chinese README](https://img.shields.io/badge/简体中文-d9d9d9)](./README.md)
 
 # RoboDriver
 
