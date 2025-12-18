@@ -58,12 +58,13 @@ dora build dataflow.yml --uv
 
 1. 断开所有硬件USB连接。
 
-2. 插入头部摄像头，这里默认插入的是 `realsense 435` 相机，如果您用的是别的相机，编号及其数量可能会有所不同，请根据情况修改dora/dataflow.yml：
+2. 插入头部摄像头，这里默认插入的是 `realsense 435` 相机，如果您用的是别的相机或电脑自带有相机，编号及其数量可能会有所不同，请根据情况修改dora/dataflow.yml：
 
     ```bash
     ls /dev/video*
     # 可以看到： /dev/video0 /dev/video1 /dev/video2 /dev/video3 /dev/video4 /dev/video5
     # 可以查看(请先安装sudo apt install ffmpeg)： ffplay /dev/video2
+    # 如果编号不同，请查看确认后，调整dora/dataflow.yml
     ```
 
 3. 插入腕部摄像头
@@ -72,16 +73,22 @@ dora build dataflow.yml --uv
     # 可以看到： /dev/video0 /dev/video1 /dev/video2 /dev/video3 /dev/video4 /dev/video5 /dev/video6 /dev/video7
     ```
 
-4. 插入SO101主臂USB（如何区分主从臂? 主臂末端是一个扳机，主臂使用5V电源）：
+4. 插入 SO101 主臂 USB（如何区分主从臂? 主臂末端是一个扳机，主臂使用5V电源）：
     ```bash
     ls /dev/ttyACM*
     # 可以看到: /dev/ttyACM0
     ```
 
-5. 插入SO101从臂USB（如何区分主从臂? 主臂末端是一个扳机，主臂使用5V电源）：
+5. 插入 SO101 从臂 USB（如何区分主从臂? 主臂末端是一个扳机，主臂使用5V电源）：
     ```bash
     ls /dev/ttyACM*
     # 可以看到: /dev/ttyACM0 /dev/ttyACM1
+    ```
+
+6. 为机械臂 USB 接口赋予权限：
+    ‵‵‵
+    sudo chmod 666 /dev/ttyACM0
+    sudo chmod 666 /dev/ttyACM1
     ```
 
 启动 `dora` ：
