@@ -25,7 +25,7 @@ dora -V
 dora-cli <版本号>
 ```
 
-如果没有，请参考 [dora安装](https://dora-rs.ai/docs/guides/Installation/installing)
+如果没有，请参考 [RoboDriver文档/概览/安装与部署/推荐可选安装/dora](https://flagopen.github.io/RoboDriver-Doc/docs/overview/installation/#dora)
 
 确保进入RoboDriver目录，如果已经进入就跳过：
 
@@ -131,22 +131,11 @@ cd robodriver/robots/robodriver-robot-so101-aio-dora
 uv pip install -e .
 ```
 
-回到 `RoboDriver` 目录：
-
-```bash
-cd ../../
-```
-
 `RoboDriver` 部分启动命令如下:
 
-```bash title="uv"
-uv run robodriver/scripts/run.py --robot.type=so101_aio_dora
+```bash
+robodriver-run --robot.type=so101_aio_dora
 ```
-
-```bash title="conda"
-python3 robodriver/scripts/run.py --robot.type=so101_aio_dora
-```
-
 
 ## TODO
 

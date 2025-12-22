@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dora-arm-so101"
-version = "0.0.1"
+version = "0.0.2"
 description = ""
 authors = [
     {name = "Xiang Yang",email = "ryu-yang@qq.com"}
