@@ -23,6 +23,10 @@ dependencies = [
     "python-socketio",
 ]
 
+[project.optional-dependencies]
+
+[project.scripts]
+robodriver-run="robodriver.scripts.run:main"
+
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["robodriver"]
+where = ["robodriver"]

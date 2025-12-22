@@ -131,22 +131,11 @@ cd robodriver/robots/robodriver-robot-so101-aio-dora
 uv pip install -e .
 ```
 
-回到 `RoboDriver` 目录：
-
-```bash
-cd ../../
-```
-
 `RoboDriver` 部分启动命令如下:
 
-```bash title="uv"
-uv run robodriver/scripts/run.py --robot.type=so101_aio_dora
+```bash
+robodriver-run --robot.type=so101_aio_dora
 ```
-
-```bash title="conda"
-python3 robodriver/scripts/run.py --robot.type=so101_aio_dora
-```
-
 
 ## TODO
 
