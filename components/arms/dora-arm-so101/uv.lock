@@ -51,7 +51,7 @@ wheels = [
 
 [[package]]
 name = "dora-arm-so101"
-version = "0.0.1"
+version = "0.0.2"
 source = { editable = "." }
 dependencies = [
     { name = "deepdiff", version = "8.4.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple" }, marker = "python_full_version < '3.9'" },
