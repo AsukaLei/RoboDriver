@@ -164,29 +164,32 @@ def visualize_dataset(
                 rr.set_time("timestamp", timestamp=batch["timestamp"][i].item())
                 # display each camera image
                 for key in dataset.meta.camera_keys:
-                    if "depth" in key:
-                        continue
-                    # TODO(rcadene): add `.compress()`? is it lossless?
-                    # rr.log(key, rr.Image(to_hwc_uint8_numpy(batch[key][i])))
-                    if len(dataset.meta.video_keys) > 0:
-                        # dataset.meta.video_path
-                        pass
-                    elif len(dataset.meta.image_keys) > 0:
-                        img_path = dataset.root / dataset.meta.get_image_file_path(
-                            img_key=key,
-                            ep_index=episode_index,
-                            frame_index=batch["frame_index"][i],
-                        )
-                        # 1. 验证路径是否存在
-                        if not Path(img_path).exists():
-                            raise FileNotFoundError(
-                                f"Image path does not exist: {img_path}"
-                            )
-                        img = cv2.imread(img_path)
+                    rr.log(key, rr.Image(to_hwc_uint8_numpy(batch[key][i])))
 
-                        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                    # if "depth" in key:
+                    #     continue
+                    # # TODO(rcadene): add `.compress()`? is it lossless?
+                    # # rr.log(key, rr.Image(to_hwc_uint8_numpy(batch[key][i])))
+                    # if len(dataset.meta.video_keys) > 0:
+                    #     # dataset.meta.video_path
+                    #     pass
+                    # elif len(dataset.meta.image_keys) > 0:
+                    #     img_path = dataset.root / dataset.meta.get_image_file_path(
+                    #         img_key=key,
+                    #         ep_index=episode_index,
+                    #         frame_index=batch["frame_index"][i],
+                    #     )
+                    #     # 1. 验证路径是否存在
+                    #     if not Path(img_path).exists():
+                    #         raise FileNotFoundError(
+                    #             f"Image path does not exist: {img_path}"
+                    #         )
+                    #     img = cv2.imread(img_path)
 
-                        rr.log(key, rr.Image(img))
+                    #     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+                    #     rr.log(key, rr.Image(img))
+
                 # display each dimension of action space (e.g. actuators command)
                 if "action" in batch:
                     for dim_idx, val in enumerate(batch["action"][i]):
