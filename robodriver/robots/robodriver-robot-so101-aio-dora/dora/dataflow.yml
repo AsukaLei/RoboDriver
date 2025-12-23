@@ -7,7 +7,7 @@ nodes:
     outputs:
       - image
     env:
-      VIRTUAL_ENV: ./camera.venv
+      VIRTUAL_ENV: camera.venv
       CAPTURE_PATH: 4
       IMAGE_WIDTH: 640
       IMAGE_HEIGHT: 480
