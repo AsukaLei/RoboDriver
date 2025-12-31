@@ -41,9 +41,9 @@ cd robodriver/robots/robodriver-robot-agilex-aloha-aio-dora/
 
 配置USB规则：
 
-```
+```bash
 sudo bash ./scripts/install_udev_rules.sh
-sudo udevadm control --reload-rules && sudo udevadm
+sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
 进入到 `dora/` 目录。
