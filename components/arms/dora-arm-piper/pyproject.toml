@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dora-arm-piper"
-version = "0.0.1"
+version = "0.0.5"
 description = ""
 authors = [
     {name = "Xiang Yang",email = "ryu-yang@qq.com"}
@@ -24,9 +24,9 @@ view = [
 ]
 
 [project.scripts]
-dora-arm-so101 = "dora_arm_so101.main:main"
+dora-arm-piper = "dora_arm_piper.main:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["dora_arm_so101"]
+include = ["dora_arm_piper"]
 exclude = []
