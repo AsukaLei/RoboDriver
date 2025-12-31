@@ -33,16 +33,29 @@ dora-cli <版本号>
 cd RoboDriver/
 ```
 
-进入到 `robodriver-robot-agilex-aloha-aio-dora/dora` 目录。
+进入到 `robodriver-robot-agilex-aloha-aio-dora/` 目录。
 
 ```bash
-cd robodriver/robots/robodriver-robot-so101-aio-dora/dora
+cd robodriver/robots/robodriver-robot-agilex-aloha-aio-dora/
+```
+
+配置USB规则：
+
+```
+sudo bash ./scripts/install_udev_rules.sh
+sudo udevadm control --reload-rules && sudo udevadm
+```
+
+进入到 `dora/` 目录。
+
+```bash
+cd dora
 ```
 
 创建多个 `uv` 环境:
 
 ```bash
-uv venv camera.venv
+uv venv camera.venv -p 3.10
 uv venv arm.venv
 ```
 
